@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    上傳檔案
+
+    <form method="post">
+        {% csrf_token %}
+
+        <input type="text" name="filename">
+        <br>
+        <input type="file" name="data">
+        <input type="submit">
+    </form>
+</body>
+</html>

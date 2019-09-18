@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>搜尋</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'jquery-ui.theme.min.css' %}">
+    <link rel="stylesheet" href="{% static 'jquery-ui.structure.min.css' %}">
+    <script src="{% static 'jquery-1.12.4.js' %}"></script>
+    <script src="{% static 'jquery-ui.min.js' %}"></script>
+    <link href="{% static 'jquery-ui.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="{% static 'DataTables/datatables.css' %}">
+    <script src="{% static 'DataTables/datatables.js' %}"></script>
+    <script src="{% static 'adv_dialog.js' %}"></script>
+    <script src="{% static 'helper.js' %}"></script>
+
+    <script>
+        $(function () {
+            $("#tabs").tabs();
+            $(".button").button();
+        });
+
+        var empty_search = [];
+
+
+        function course_detail(ccid) {
+            $.showModalDialog({
+                url: 'https://aisap.nutc.edu.tw/public/day/course_details.aspx?sem=1081&ccid=' + ccid,
+                width: 750,
+                height: $(window).height() + 10,
+                scrollable: false,
+                resizable: false,
+                onClose: function () {
+                    if (this.returnValue > 0) location.reload();
+                },
+                position: {my: "center", at: "top", of: $("body"), within: $("body")}
+            });
+            return false;
+        }
+    </script>
+
+</head>
+
+<body>
+<div id="tabs">
+    <ul>
+        <li><a href="#tabs-1">搜尋</a></li>
+        <li><a href="#tabs-2">老師搜尋</a></li>
+        <li><a href="#tabs-3">科目搜尋</a></li>
+        <li><a href="#tabs-4">搜尋詭異東西</a></li>
+    </ul>
+    <div id="tabs-1">
+        <script>
+            $(function () {
+
+                $("#selectable").selectable({
+
+                    filter: ".ui-state-default",
+
+                    stop: function () {
+                        empty_search = []
+                        $(".ui-selected", this).each(function () {
+                            var index = $("#selectable .ui-state-default").index(this);
+                            empty_search.push(index);
+
+                        });
+                    }
+                });
+            });
+
+        </script>
+
+        <ol id="selectable">
+            <li></li>
+            <li>一</li>
+            <li>二</li>
+            <li>三</li>
+            <li>四</li>
+            <li>五</li>
+            <li>1</li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li>2</li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li>3</li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li>4</li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="line">
+                <hr>
+            </li>
+            <li>5</li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li>6</li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li>7</li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li>8</li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+            <li class="ui-state-default"></li>
+        </ol>
+
+        <button id="empty" class="button">搜尋</button>
+
+        <br><br>
+
+        <div id="dstab">
+            <label for="department">選擇科系</label>
+            <select name="department" id="department">
+                <option disabled selected></option>
+                {% for departmentname in all_departmentname %}
+                    {% for name in departmentname %}
+                        <option>{{ name }}</option>
+                    {% endfor %}
+                {% endfor %}
+
+            </select>
+        </div>
+
+        {#選擇科系#}
+        <script>
+            let department = $("#department");
+            let selected_department = new Set();
+            let tabs1 = $("#dstab");
+
+            department.selectmenu({
+                select: function (event, data) {
+                    if (!selected_department.has(data.item.value)) {
+                        selected_department.add(data.item.value);
+                        tabs1.append("<div class='selected_department' id='" + data.item.value + "'>" + data.item.value + "<button class='ui-button dbutton' id='" + data.item.value + "del'>刪除</button></div>");
+                        tabs1.append("<script>$('#" + data.item.value + "del').click(function(){var pp = $(this).parent();var pid = pp.attr('id');selected_department.delete(pid);pp.remove();})</" + "script>")
+                    }
+                }
+            });
+        </script>
+
+        {% csrf_token %}
+        <script>$.ajaxSetup({headers: {"X-CSRFToken": '{{ csrf_token }}'}});</script>
+
+        <script>
+            let empty = $("#empty");
+
+            empty.click(function () {
+
+                $.ajax({
+                    type: "POST",
+                    data: {type: 'empty', empty_search: empty_search, department: Array.from(selected_department)},
+                    url: "{% url 'index' %}",
+                    cache: false,
+                    dataType: "json",
+                    success: function (result) {
+                        table.fnClearTable();
+
+                        let ans = result['result'];
+
+                        ans.forEach(function (element) {
+
+                            let a = '<a href="#" onclick="return course_detail(' + element[0]
+                                + ');" data-hasqtip="8" oldtitle="查看課程內容" title="" aria-describedby="qtip-8">'
+                                + element[1] + '</a>';
+
+                            table.fnAddData([
+                                a,
+                                element[2],
+                                element[3],
+                                element[4],
+                                element[5]
+                            ]);
+                        });
+
+
+                        alert("讚讚");
+
+                    },
+                    error: function () {
+                        alert("給我選噢");
+                    }
+                });
+            });
+        </script>
+    </div>
+
+    {#搜老師#}
+    <div id="tabs-2">
+        <script>
+            $(function () {
+                let teacherTags = [
+                    {% for teachername in all_teachername %}
+                        {% for teacher in teachername %}
+                            "{{ teacher }}",
+                        {% endfor %}
+                    {% endfor %}
+                ];
+
+                $("#teachertags").autocomplete({
+                    source: teacherTags
+                });
+            });
+        </script>
+
+        <div class="ui-widget">
+            <label for="tags">老師：</label>
+            <input id="teachertags">
+            <button id="teacherbtn" class="button">搜尋</button>
+        </div>
+
+        <script>
+            let teacherbtn = $("#teacherbtn");
+
+            teacherbtn.click(function () {
+
+                $.ajax({
+                    type: "POST",
+                    data: {type: 'teacher', teacher_search: $("#teachertags").val()},
+                    url: "{% url 'index' %}",
+                    cache: false,
+                    dataType: "json",
+                    success: function (result) {
+                        table.fnClearTable();
+
+                        let ans = result['result'];
+
+
+                        ans.forEach(function (element) {
+
+                            let a = '<a href="#" onclick="return course_detail(' + element[0]
+                                + ');" data-hasqtip="8" oldtitle="查看課程內容" title="" aria-describedby="qtip-8">'
+                                + element[1] + '</a>';
+
+                            table.fnAddData([
+                                a,
+                                element[2],
+                                element[3],
+                                element[4],
+                                element[5]
+                            ])
+                        });
+                    },
+                    error: function () {
+                        alert(888);
+                    }
+                });
+            });
+        </script>
+
+    </div>
+
+    {#搜科目#}
+    <div id="tabs-3">
+        <script>
+            $(function () {
+                var courseTags = [
+                    //這裡要連科目
+                    {% for name in all_coursename %}
+                        {% for n in name %}
+                            "{{n}}",
+                        {% endfor %}
+                    {% endfor %}
+
+                ];
+                $("#coursetags").autocomplete({
+                    source: courseTags
+                });
+            });
+
+            $(".button").button();
+        </script>
+
+        <div class="ui-widget">
+            <label for="tags">科目：</label>
+            <input id="coursetags">
+            <button id="coursebtn" class="button">搜尋</button>
+        </div>
+
+        <script>
+            var coursebtn = $("#coursebtn");
+
+            coursebtn.click(function () {
+
+                $.ajax({
+                    type: "POST",
+                    data: {type: 'course', course_search: $("#coursetags").val()},
+                    url: "{% url 'index' %}",
+                    cache: false,
+                    dataType: "json",
+                    success: function (result) {
+                        table.fnClearTable();
+
+                        let ans = result['result'];
+
+                        ans.forEach(function (element) {
+
+                            let a = '<a href="#" onclick="return course_detail(' + element[0]
+                                + ');" data-hasqtip="8" oldtitle="查看課程內容" title="" aria-describedby="qtip-8">'
+                                + element[1] + '</a>';
+
+                            table.fnAddData([
+                                a,
+                                element[2],
+                                $("#teachertags").val(),
+                                element[4],
+                                element[5]
+                            ])
+                        });
+                    },
+                    error: function () {
+                        alert(888);
+                    }
+                });
+            });
+        </script>
+    </div>
+
+    {#搜詭異#}
+    <div id="tabs-4">
+        <div class="ui-widget">
+            <button id="noworkbtn" class="button">搜尋沒課老師</button>
+            <button id="avgbtn" class="button">搜尋學分平均</button>
+        </div>
+
+        <script>
+            var noworkbtn = $("#noworkbtn");
+
+            noworkbtn.click(function () {
+
+                $.ajax({
+                    type: "POST",
+                    data: {type: 'nowork'},
+                    url: "{% url 'index' %}",
+                    cache: false,
+                    dataType: "json",
+                    success: function (result) {
+                        table.fnClearTable();
+
+                        ans = result['result'];
+
+                        ans.forEach(function (element) {
+                            table.fnAddData([
+                                'null',
+                                'null',
+                                element[0],
+                                'null',
+                                'null'
+                            ])
+                        });
+                    },
+                    error: function () {
+                        alert(888);
+                    }
+                });
+            });
+        </script>
+
+        <script>
+            var avgbtn = $("#avgbtn");
+
+            avgbtn.click(function () {
+                $.ajax({
+                    type: "POST",
+                    data: {type: 'avg'},
+                    url: "{% url 'index' %}",
+                    cache: false,
+                    dataType: "json",
+                    success: function (result) {
+                        table.fnClearTable();
+
+                        ans = result['result'];
+
+                        ans.forEach(function (element) {
+                            table.fnAddData([
+                                element[0],
+                                element[1],
+                                element[2],
+                                element[3],
+                                null
+                            ])
+                        });
+                    },
+                    error: function () {
+                        alert(888);
+                    }
+                });
+            });
+        </script>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        table = $('#myTable').dataTable();
+    });
+</script>
+
+<table id="myTable" class="display">
+    <thead>
+    <tr>
+        <th id="name">課程名稱</th>
+        <th id="class">班級</th>
+        <th id="teacher">老師</th>
+        <th id="time">時間(地點)</th>
+        <th id="credit">學分</th>
+    </tr>
+    </thead>
+    <tbody id="tbody">
+    <tr id="column1">
+        <td>
+            <a href="#" onclick="return course_detail(7270);" data-hasqtip="8" oldtitle="查看課程內容" title=""
+               aria-describedby="qtip-8">資料庫</a>
+        </td>
+        <td>資管四甲</td>
+        <td>真伊棒棒</td>
+        <td>禮拜二三四節</td>
+        <td>2</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+
+</html>
