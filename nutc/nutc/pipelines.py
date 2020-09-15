@@ -42,15 +42,12 @@ class SetupMysqlPipeline(object):
             )
 
             classes, _ = Classes.objects.get_or_create(
-                id=item['number']
+                id=item['number'],
+                department_id=department.id,
+                grade=item['name']['grade'],
+                classes=item['name']['classes'],
+                name=item['full_name']
             )
-
-            classes.department = department
-            classes.grade = item['name']['grade']
-            classes.classes = item['name']['classes']
-            classes.name = item['full_name']
-
-            classes.save()
 
         return item
 

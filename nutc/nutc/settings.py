@@ -100,4 +100,4 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'nutc_curriculum.settings'
 django.setup()
 
 today = datetime.datetime.today()
-LOG_FILE = f'{today.strftime("%d-%H-%M")}.log'
+LOG_FILE = f'logs/{today.strftime("%d-%H-%M")}.log'

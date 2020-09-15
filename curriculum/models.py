@@ -44,6 +44,11 @@ class Classes(models.Model):
 
 
 class Teacher(models.Model):
+
+    id = models.IntegerField(
+        primary_key=True,
+    )
+
     # ex:林真伊
     name = models.CharField(
         max_length=30

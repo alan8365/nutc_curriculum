@@ -39,6 +39,8 @@ def delete_combine(li: list) -> str:
 def change_to_three_part(li: list) -> dict:
     pattern = f'[{reference_string}]'
     temp = re.split(pattern, li[0])
+    if temp[1] == '':
+        temp[1] = '1'
     result = {
         'department': temp[0],
         'grade': my_int(re.search(pattern, li[0])[0]),

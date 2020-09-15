@@ -66,6 +66,8 @@ class CurriculumSpider(scrapy.Spider):
         else:
             sem = f'{this_year}1'
 
+        print(sem)
+
         base_url = f'https://aisap.nutc.edu.tw/public/day/course_list.aspx?sem={sem}&clsno='
 
         # 從資料庫獲得所有班級
