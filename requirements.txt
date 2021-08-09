@@ -37,7 +37,7 @@ pyodbc==4.0.26
 pyOpenSSL==19.0.0
 pypiwin32==223
 pytz==2019.1
-pywin32==224
+pywin32==301
 query-string==2019.4.13
 queuelib==1.5.0
 request==2019.4.13
